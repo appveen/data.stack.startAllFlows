@@ -39,5 +39,13 @@ var FlowList = []struct {
 	Status  string `json:"status"`
 }{}
 
+// Flow is the list of apps
+var Flow = struct {
+	ID      string `json:"_id"`
+	Name    string `json:"name"`
+	Partner string `json:"partner"`
+	Status  string `json:"status"`
+}{}
+
 // Flows is the name of apps in an array of strings
 var Flows = []string{}
