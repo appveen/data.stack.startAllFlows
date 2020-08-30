@@ -21,3 +21,5 @@ cd bin
 md5sum startFlows-linux-386 > md5sum.txt
 md5sum startFlows-linux-amd64 >> md5sum.txt
 md5sum startFlows-mac >> md5sum.txt
+md5sum startFlows-windows-386.exe >> md5sum.txt
+md5sum startFlows-windows-amd64.exe >> md5sum.txt
