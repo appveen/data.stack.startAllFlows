@@ -3,23 +3,20 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"sync"
 	"time"
-
-	"github.com/fatih/color"
 )
 
 // Check - display error
 func check(e error) {
 	if e != nil {
-		panic(e)
+		logger.Panic(e)
 	}
 }
 
 func ifErrorExit(e error) {
 	if e != nil {
-		os.Exit(0)
+		logger.Panic(e)
 	}
 }
 
@@ -58,14 +55,14 @@ func deployFlow(_wg *sync.WaitGroup, _flowID string) {
 	responseBody := Get("/api/a/pm/flow/" + _flowID + "?select=name,partner,status")
 	err := json.Unmarshal(responseBody, &Flow)
 	check(err)
-	fmt.Print("Flow " + color.YellowString(getPartnerName(Flow.Partner)+":"+getFlowName(_flowID)) + " :: ")
+	fmt.Print("Flow " + getPartnerName(Flow.Partner) + ":" + getFlowName(_flowID) + " -> ")
 	// Deploy
 	Put("/api/a/pm/flow/"+_flowID+"/start", "{}")
 	// Fetch
-	fmt.Print(color.BlueString("Pending"))
+	fmt.Print("Pending")
 	for {
-		time.Sleep(1000 * time.Millisecond)
-		responseBody := Get("/api/a/pm/flow/" + _flowID + "?select=name,partner,status")
+		time.Sleep(10000 * time.Millisecond)
+		responseBody := Get("/api/a/pm/flow/" + _flowID + "?select=status")
 		err := json.Unmarshal(responseBody, &Flow)
 		check(err)
 		if Flow.Status != "Pending" {
@@ -73,11 +70,5 @@ func deployFlow(_wg *sync.WaitGroup, _flowID string) {
 		}
 	}
 	fmt.Print("\b\b\b\b\b\b\b")
-	// fmt.Print("Flow " + color.YellowString(getFlowName(_flowID)) + " :: ")
-	if Flow.Status == "Active" {
-		fmt.Println(color.GreenString(Flow.Status) + " ")
-	}
-	if Flow.Status == "Stopped" {
-		fmt.Println(color.RedString(Flow.Status))
-	}
+	fmt.Println(Flow.Status + " ")
 }

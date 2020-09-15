@@ -4,18 +4,32 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
+	"strconv"
 	"sync"
+	"time"
 )
 
 func main() {
+	t := time.Now()
+	fileName := "runLog_" + strconv.FormatInt(t.Unix(), 10) + ".log"
+	loggingFile, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY, 0664)
+	check(err)
+
+	logger.SetOutput(loggingFile)
+	logger.SetFlags(log.LstdFlags)
+
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	logger.Println("Disabling TLS")
 
 	initialQuestions()
 	Login()
 
+	logger.Println("Getting the list of apps")
 	responseBody := Get("/api/a/rbac/app?select=_id&count=-1")
-	err := json.Unmarshal(responseBody, &AppList)
+	err = json.Unmarshal(responseBody, &AppList)
 	check(err)
 
 	selectedApp := selectAppQuestion()
@@ -34,12 +48,15 @@ func main() {
 	check(err)
 
 	selectedFlows := selectFlowsQuestion()
-	fmt.Println(len(selectedFlows))
 
+	fmt.Println("")
 	var wg sync.WaitGroup
 	for i := 0; i < len(selectedFlows); {
 		wg.Add(1)
 		deployFlow(&wg, selectedFlows[i])
+		Logout()
+		Login()
 		i++
 	}
+	fmt.Println("")
 }

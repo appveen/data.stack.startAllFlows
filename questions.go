@@ -44,6 +44,7 @@ func selectAppQuestion() string {
 	var app string
 	err := survey.Ask(questions, &app)
 	check(err)
+	logger.Println("Selected app " + app)
 	return app
 }
 
@@ -63,11 +64,13 @@ func selectPartnerQuestion() string {
 	err := survey.Ask(questions, &selectedPartners)
 	check(err)
 
+	logger.Println("Selected Partners")
 	selectedPartnerIds := []string{}
 	for _, v := range selectedPartners {
 		for _, p := range PartnerList {
 			if v == p.Name {
 				selectedPartnerIds = append(selectedPartnerIds, p.ID)
+				logger.Println(" Partners " + p.ID + ":" + p.Name)
 			}
 		}
 	}
@@ -104,11 +107,22 @@ func selectFlowsQuestion() []string {
 	err := survey.Ask(questions, &selectedFlows)
 	check(err)
 
+	logger.Println("Selected Flows")
 	selectedFlowIds := []string{}
 	for _, v := range selectedFlows {
 		flowid := strings.Split(v, "(")[1]
 		flowid = strings.Split(flowid, ")")[0]
+
+		flowName := strings.Split(v, "(")[0]
+		flowName = strings.Split(flowName, ":")[1]
+		flowName = strings.Split(flowName, "[0m")[1]
+
+		partnerName := strings.Split(v, ":")[0]
+		partnerName = strings.Split(partnerName, "[33;3m")[1]
+
+		logger.Println(" Partner " + partnerName + "/Flow " + flowid + ":" + flowName)
 		selectedFlowIds = append(selectedFlowIds, flowid)
 	}
+	logger.Println("Selected flow ids: " + strings.Join(selectedFlowIds, ","))
 	return selectedFlowIds
 }

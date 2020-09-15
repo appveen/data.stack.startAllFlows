@@ -1,5 +1,7 @@
 package main
 
+import "log"
+
 // Init - initial details from user
 var Init = struct {
 	URL      string `survey:"url"`
@@ -9,8 +11,9 @@ var Init = struct {
 
 // LoginResponse - Response structure after logging in
 var LoginResponse = struct {
-	ID    string `json:"_id"`
-	Token string `json:"token"`
+	ID                    string `json:"_id"`
+	Token                 string `json:"token"`
+	RbacUserTokenDuration int    `json:"rbacUserTokenDuration"`
 }{}
 
 // AppList is the list of apps
@@ -49,3 +52,5 @@ var Flow = struct {
 
 // Flows is the name of apps in an array of strings
 var Flows = []string{}
+
+var logger = log.Logger{}
